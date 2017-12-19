@@ -17,7 +17,7 @@
       user-select: none;
     }
 
-    *:hover{
+    *:hover {
       cursor: default;
     }
 
@@ -179,7 +179,7 @@
     .modal-button {
       cursor: pointer;
       z-index: 10;
-      margin: 0 0 0 1em;
+      margin: 2em 0;
       align-self: center;
       padding: 0.2em 0.5em;
       text-transform: uppercase;
@@ -206,12 +206,13 @@
       border-radius: 2px;
     }
 
-    .modal p {
-      margin-bottom: 0;
+    .modal a {
+      text-decoration: none;
+      color: #A63D40;
     }
 
-    .modal p:last-of-type {
-      margin-bottom: 3em;
+    .modal p {
+      margin-bottom: 0;
     }
 
     .modal-title {
@@ -231,6 +232,10 @@
     <p>On the <b>right</b> you have <b>continuity levels</b></p>
     <p>On the <b>top</b> you can switch between curve <b>types</b></p>
     <button class="modal-button" onclick="closeModal();">Close</button>
+    <small>
+      Fork it on <a href="https://github.com/mentos1386/bezier-curve-drawing">Github</a> - Made by
+      <a href="https://github.com/mentos1386">@Mentos1386</a>
+    </small>
   </div>
 </div>
 
