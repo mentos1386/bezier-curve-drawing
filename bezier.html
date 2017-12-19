@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bezier</title>
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.css"
+        integrity="sha256-sxzrkOPuwljiVGWbxViPJ14ZewXLJHFJDn0bv+5hsDY="
+        crossorigin="anonymous"/>
+  <script src="bezier.js" defer></script>
+
+  <style>
+    html {
+      overflow: hidden;
+      height: 100%;
+      user-select: none;
+    }
+
+    *:hover{
+      cursor: default;
+    }
+
+    body {
+      height: 100%;
+      background: #A63D40;
+      background-image: url("./tile.png");
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    }
+
+    .navbar {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-content: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding-left: 20%;
+      padding-right: 20%;
+    }
+
+    .navbar-title {
+      z-index: 20;
+      color: #f3f3f3;
+      font-size: 1.5em;
+      font-weight: 300;
+    }
+
+    .navbar-menu {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .sidebar-item,
+    .navbar-item {
+      cursor: pointer;
+      z-index: 10;
+      color: #f3f3f3;
+      margin: 0 0 0 1em;
+      align-self: center;
+      padding: 0.2em 0.5em;
+      border: 1px solid #f3f3f3;
+      text-transform: uppercase;
+      font-weight: 300;
+      transition-duration: 80ms;
+    }
+
+    .navbar-item-group {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .navbar-item-group .navbar-item:not(:first-child) {
+      margin: 0;
+      border-left: 0;
+    }
+
+    .sidebar-item:hover,
+    .sidebar-item.active,
+    .navbar-item:hover,
+    .navbar-item.active {
+      background: #f3f3f3;
+      color: #A63D40;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      align-content: center;
+      justify-content: center;
+      margin-left: 1em;
+    }
+
+    .sidebar-right {
+      left: auto;
+      right: 0;
+      margin-left: auto;
+      margin-right: 1em;
+    }
+
+    .sidebar-title {
+      z-index: 20;
+      color: #f3f3f3;
+      font-size: 1.2em;
+      font-weight: 300;
+      margin: 0;
+      align-self: center;
+    }
+
+    .sidebar-item {
+      margin: 0.5em 0 0 0;
+      align-self: center;
+    }
+
+    .sidebar-item-colors {
+      margin: 0.5em 0 0 0;
+      align-self: center;
+
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      max-width: 4.5em;
+      z-index: 10;
+    }
+
+    .sidebar-item-colors > * {
+      display: block;
+      height: 1.5em;
+      width: 1.5em;
+      content: "\274c";
+      cursor: pointer;
+      transition-duration: 80ms;
+      position: relative;
+    }
+
+    .sidebar-item-colors > *.active:after {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      content: "\274c"; /* use the hex value here... */
+      font-size: 1em;
+      color: #A63D40;
+      line-height: 1.5em;
+      text-align: center;
+    }
+
+    #canvas {
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .body-wrap {
+      filter: blur(5px);
+    }
+
+    .modal-wrap {
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      position: absolute;
+      display: flex;
+      justify-content: center;
+      align-content: center;
+      z-index: 100;
+    }
+
+    .modal-button {
+      cursor: pointer;
+      z-index: 10;
+      margin: 0 0 0 1em;
+      align-self: center;
+      padding: 0.2em 0.5em;
+      text-transform: uppercase;
+      font-weight: 300;
+      transition-duration: 80ms;
+      background: none;
+      border: 1px solid #A63D40;
+      color: #A63D40;
+    }
+
+    .modal-button:hover {
+      color: #f3f3f3;
+      background: #A63D40;
+    }
+
+    .modal {
+      display: flex;
+      flex-direction: column;
+      align-self: center;
+      background: #f3f3f3;
+      filter: blur(0px);
+      padding: 1em 2em;
+      box-shadow: 0 19px 38px rgba(0, 0, 0, 0.30), 0 15px 12px rgba(0, 0, 0, 0.22);
+      border-radius: 2px;
+    }
+
+    .modal p {
+      margin-bottom: 0;
+    }
+
+    .modal p:last-of-type {
+      margin-bottom: 3em;
+    }
+
+    .modal-title {
+      margin: 0.5em 0;
+      font-weight: 300;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="modal-wrap" id="modal-wrap">
+  <div class="modal">
+    <h2 class="modal-title">Hello</h2>
+    <p>On the <b>left</b> you have <b>tools</b></p>
+    <p>On the <b>right</b> you have <b>continuity levels</b></p>
+    <p>On the <b>top</b> you can switch between curve <b>types</b></p>
+    <button class="modal-button" onclick="closeModal();">Close</button>
+  </div>
+</div>
+
+<div class="body-wrap" id="body-wrap">
+  <div class="navbar">
+    <p class="navbar-title">Bezier Curves</p>
+    <div class="navbar-menu">
+      <div class="navbar-item-group">
+        <p class="navbar-item active"
+           id="switch-quadratic"
+           onclick="switchDrawingMethod('quadratic');">Quadratic</p>
+        <p class="navbar-item" id="switch-cubic" onclick="switchDrawingMethod('cubic');">Cubic</p>
+      </div>
+
+      <p class="navbar-item" id="clear-canvas">Clear</p>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <p class="sidebar-title">Tools</p>
+    <p class="sidebar-item active" id="switch-draw" onclick="switchTool('draw');">Draw</p>
+    <p class="sidebar-item" id="switch-delete" onclick="switchTool('delete');">Delete</p>
+    <p class="sidebar-item" id="switch-color" onclick="switchTool('color');">Color</p>
+    <div class="sidebar-item-colors">
+      <span id="color-dark"></span>
+      <span id="color-grey"></span>
+      <span id="color-white"></span>
+      <span id="color-blue"></span>
+      <span id="color-red"></span>
+      <span id="color-pink"></span>
+      <span id="color-lime"></span>
+      <span id="color-yellow"></span>
+      <span id="color-orange"></span>
+    </div>
+  </div>
+
+  <div class="sidebar sidebar-right">
+    <p class="sidebar-title">Continuity level</p>
+    <p class="sidebar-item active"
+       id="switch-continuity-0"
+       onclick="switchContinuity('continuity-0');">
+      C0</p>
+    <p class="sidebar-item" id="switch-continuity-1" onclick="switchContinuity('continuity-1');">
+      C1</p>
+    <p class="sidebar-item" id="switch-continuity-2" onclick="switchContinuity('continuity-2');">
+      C2</p>
+  </div>
+
+</div>
+
+</body>
+</html>
